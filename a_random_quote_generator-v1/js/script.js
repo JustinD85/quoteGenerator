@@ -1,11 +1,11 @@
-// Random Quote Generator
+// Random Quote Generator - Justin Duncan
 
 // Create the array of quote objects and name it quotes
 var quotes = [{
     quote: "I love you the more in that I believe you had" +
       " liked me for my own sake and for nothing else.",
     source: "John Keats",
-    categorization:  "love",
+    categorization: "love",
     year: ""
   },
   {
@@ -48,31 +48,34 @@ var quotes = [{
 ];
 
 
-// Create the getRandomQuote function and name it getRandomQuote
-var picked = [];
-var quoteArr = quotes;
+//To track quotes that have been shown and remove them from random pool
+var shownQuotes = [];
+// grabs copy of quotes to manipulate
+var notShownQuotes = quotes;
 
+// Create the getRandomQuote function and name it getRandomQuote
 function getRandomQuote() {
-  //filter out quotes already shown
-  if (picked.length !== 0) {
-    picked.forEach(function(i) {
-      for (var j = 0; j < quoteArr.length; j++) {
-        if (i.quote === quoteArr[j].quote) {
-          quoteArr.splice(j, 1);
+  if (shownQuotes.length !== 0) {
+    //checks if a shown quote is in the notShownQuotes arry and removes it
+    shownQuotes.forEach(function(shownQuote) {
+      for (var i = 0; i < notShownQuotes.length; i++) {
+        if (shownQuote.quote === notShownQuotes[i].quote) {
+          notShownQuotes.splice(i, 1);
         }
       }
     })
   }
-
-  if (quoteArr.length === 0) {
-    quoteArr = quotes;
+  //resets the array if all have been shown
+  if (notShownQuotes.length === 0) {
+    notShownQuotes = quotes;
   }
-
-  var returnVal = Math.round(Math.random() * quoteArr.length - 1);
+  // generates random number according to array length
+  var returnVal = Math.round(Math.random() * notShownQuotes.length - 1);
+  // in case returnval is an invalid number because of small array size
   if (returnVal <= 0) {
-    return quoteArr[0];
+    return notShownQuotes[0];
   } else {
-    return quoteArr[returnVal]
+    return notShownQuotes[returnVal]
   }
 }
 
@@ -81,17 +84,34 @@ function printQuote() {
   var tempQuote = getRandomQuote();
   var str = '<p class="quote">' +
     ` ${tempQuote.quote}.</p>` +
-    `<p class="source">${tempQuote.source}` ;
-    if(tempQuote.year.length !== 0){
-      str +=
+    `<p class="source">${tempQuote.source}`;
+  if (tempQuote.year.length !== 0) {
+    str +=
       `<span class="year">${tempQuote.year}</span></p>`
-    }else{
-      str += '</p>'
-    }
-
+  } else {
+    str += '</p>'
+  }
+  //this portion prints to the document
   document.getElementById('quote-box').innerHTML = str;
+  //change background color
+  document.body.style.backgroundColor = ran3Color();
+  //change button as well :)
+  document.getElementById('loadQuote').style.backgroundColor = ran3Color();
+  //clears timer
+  clearInterval(timer);
+  // resets timer
+  timer = setInterval(printQuote, 5000);
+}
+//random color generator
+function ran3Color(){
+  var r = Math.round(Math.random() * 360);
+  var g = Math.round(Math.random() * 360);
+  var b = Math.round(Math.random() * 360);
+  return `rgb(${r},${g},${b})`;
 }
 
+//set interval for timer
+var timer = setInterval(printQuote, 5000);
 
 // This event listener will respond to "Show another quote" button clicks
 // when user clicks anywhere on the button, the "printQuote" function is called
